@@ -1,121 +1,128 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chess Training Board</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <title>Italian Opening Training</title>
     <link rel="stylesheet" href="https://unpkg.com/@chrisoakman/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.css">
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        html,
+        body {
+            height: 100%;
+            overflow-x: hidden;
+            touch-action: pan-y;
         }
 
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
+            color: #fff;
+            position: fixed;
+            width: 100%;
+        }
+
+        .app-container {
+            height: 100vh;
             display: flex;
             flex-direction: column;
-            align-items: center;
-            justify-content: center;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(20px);
             padding: 20px;
-            color: #fff;
-        }
-
-        .container {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border-radius: 24px;
-            padding: 30px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            max-width: 600px;
-            width: 100%;
-            animation: slideUp 0.5s ease-out;
-        }
-
-        @keyframes slideUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
         }
 
         h1 {
             color: #667eea;
-            font-size: 28px;
-            font-weight: 700;
-            margin-bottom: 10px;
+            font-size: 22px;
+            font-weight: 800;
             text-align: center;
+            margin-bottom: 8px;
+            letter-spacing: -0.5px;
         }
 
         .subtitle {
             color: #64748b;
             text-align: center;
-            margin-bottom: 25px;
-            font-size: 14px;
-        }
-
-        #board {
-            margin: 0 auto 25px;
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-        }
-
-        .info-panel {
-            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
-            border-radius: 16px;
-            padding: 20px;
-            margin-bottom: 20px;
-        }
-
-        .info-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 12px;
-            padding: 12px;
-            background: white;
-            border-radius: 10px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-        }
-
-        .info-row:last-child {
-            margin-bottom: 0;
-        }
-
-        .info-label {
-            color: #64748b;
             font-size: 13px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
+            font-weight: 500;
         }
 
-        .info-value {
-            color: #1e293b;
-            font-size: 16px;
+        .language-selector {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .lang-btn {
+            padding: 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 14px;
+            font-size: 14px;
             font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            background: white;
+            color: #475569;
+            touch-action: manipulation;
+        }
+
+        .lang-btn:active {
+            transform: scale(0.95);
+        }
+
+        .lang-btn.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-color: #667eea;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+
+        .content {
+            flex: 1;
+            padding: 20px;
+            padding-bottom: 100px;
         }
 
         .status {
             text-align: center;
-            padding: 15px;
-            border-radius: 12px;
-            font-weight: 600;
+            padding: 16px 20px;
+            border-radius: 16px;
+            font-weight: 700;
             margin-bottom: 20px;
-            animation: pulse 2s ease-in-out infinite;
+            font-size: 15px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+            animation: statusPulse 2s ease-in-out infinite;
         }
 
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.8; }
+        @keyframes statusPulse {
+
+            0%,
+            100% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.02);
+            }
         }
 
         .status.your-turn {
@@ -123,73 +130,115 @@
             color: white;
         }
 
-        .status.opponent-turn {
-            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+        .status.correct {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
             color: white;
         }
 
-        .status.game-over {
+        .status.wrong {
             background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
             color: white;
+        }
+
+        #board-container {
+            position: relative;
+            width: 100%;
+            max-width: 400px;
+            margin: 0 auto 20px;
+            touch-action: none;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        #board {
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            touch-action: none;
+        }
+
+        /* Prevent board from moving on touch */
+        #board * {
+            touch-action: none !important;
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+
+        .explanation {
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(20px);
+            border-radius: 16px;
+            padding: 18px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+            border-left: 4px solid #667eea;
+        }
+
+        .explanation h3 {
+            color: #667eea;
+            font-size: 13px;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 800;
+        }
+
+        .explanation p {
+            color: #1e293b;
+            font-size: 14px;
+            line-height: 1.7;
+            font-weight: 500;
         }
 
         .controls {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(20px);
+            padding: 16px 20px;
+            padding-bottom: calc(16px + env(safe-area-inset-bottom));
+            box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.1);
+            z-index: 50;
         }
 
-        button {
-            padding: 14px 24px;
+        .reset-btn {
+            width: 100%;
+            padding: 16px;
             border: none;
-            border-radius: 12px;
-            font-size: 15px;
-            font-weight: 600;
+            border-radius: 14px;
+            font-size: 16px;
+            font-weight: 700;
             cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        }
-
-        button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
-        }
-
-        button:active {
-            transform: translateY(0);
-        }
-
-        .btn-primary {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
+            box-shadow: 0 8px 24px rgba(102, 126, 234, 0.3);
+            touch-action: manipulation;
         }
 
-        .btn-secondary {
-            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
-            color: #475569;
-        }
-
-        .btn-danger {
-            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-            color: white;
+        .reset-btn:active {
+            transform: scale(0.97);
         }
 
         .move-history {
-            background: white;
-            border-radius: 12px;
-            padding: 15px;
-            max-height: 150px;
-            overflow-y: auto;
-            margin-top: 20px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(20px);
+            border-radius: 16px;
+            padding: 18px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
         }
 
         .move-history h3 {
             color: #1e293b;
-            font-size: 14px;
-            margin-bottom: 10px;
+            font-size: 13px;
+            margin-bottom: 12px;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 1px;
+            font-weight: 800;
         }
 
         .move-list {
@@ -199,63 +248,100 @@
         }
 
         .move-item {
-            background: #f1f5f9;
-            padding: 6px 12px;
-            border-radius: 8px;
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            padding: 8px 14px;
+            border-radius: 10px;
             font-size: 13px;
             color: #475569;
-            font-weight: 500;
+            font-weight: 700;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
         }
 
-        .highlight-square {
-            box-shadow: inset 0 0 0 3px #10b981 !important;
+        /* Improve touch targets */
+        .chessboard-63f37 .square-55d63 {
+            touch-action: none !important;
         }
 
-        @media (max-width: 600px) {
-            .container {
-                padding: 20px;
+        /* Smooth animations */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
             }
 
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .explanation,
+        .move-history {
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        /* Loading state */
+        .loading {
+            opacity: 0.6;
+            pointer-events: none;
+        }
+
+        /* Prevent text selection during drag */
+        .dragging * {
+            user-select: none !important;
+            -webkit-user-select: none !important;
+        }
+
+        @media (max-width: 380px) {
             h1 {
-                font-size: 24px;
+                font-size: 20px;
             }
 
-            .controls {
-                grid-template-columns: 1fr;
+            .subtitle {
+                font-size: 12px;
+            }
+
+            #board-container {
+                max-width: 340px;
             }
         }
     </style>
 </head>
+
 <body>
-    <div class="container">
-        <h1>♟️ Chess Training Board</h1>
-        <p class="subtitle">Practice your opening against the computer</p>
-        
-        <div id="status" class="status your-turn">
-            🎯 Your turn - Play as White
+    <div class="app-container">
+        <div class="header">
+            <h1 id="title">♟️ Italian Opening</h1>
+            <p class="subtitle" id="subtitle">Master the Italian Game</p>
+
+            <div class="language-selector">
+                <button class="lang-btn active" onclick="setLanguage('en')">🇬🇧 English</button>
+                <button class="lang-btn" onclick="setLanguage('fr')">🇫🇷 Français</button>
+            </div>
         </div>
 
-        <div id="board"></div>
-
-        <div class="info-panel">
-            <div class="info-row">
-                <span class="info-label">Move</span>
-                <span class="info-value" id="moveNumber">1</span>
+        <div class="content">
+            <div id="status" class="status your-turn">
+                🎯 Your turn - Play e4
             </div>
-            <div class="info-row">
-                <span class="info-label">To Play</span>
-                <span class="info-value" id="toPlay">White</span>
+
+            <div id="board-container">
+                <div id="board"></div>
+            </div>
+
+            <div class="explanation" id="explanation" style="display: none;">
+                <h3 id="explanationTitle">💡 Explanation</h3>
+                <p id="explanationText"></p>
+            </div>
+
+            <div class="move-history">
+                <h3 id="historyTitle">📝 Moves</h3>
+                <div class="move-list" id="moveList"></div>
             </div>
         </div>
 
         <div class="controls">
-            <button class="btn-primary" onclick="resetGame()">🔄 New Game</button>
-            <button class="btn-secondary" onclick="undoMove()">↩️ Undo</button>
-        </div>
-
-        <div class="move-history">
-            <h3>📝 Move History</h3>
-            <div class="move-list" id="moveList"></div>
+            <button class="reset-btn" id="resetBtn" onclick="resetGame()">🔄 Restart</button>
         </div>
     </div>
 
@@ -265,70 +351,165 @@
     <script>
         var board = null;
         var game = new Chess();
-        var moveHistory = [];
+        var currentMoveIndex = 0;
+        var currentLanguage = 'en';
+        var isDragging = false;
 
-        function updateStatus() {
-            var status = '';
-            var statusDiv = document.getElementById('status');
-            
-            if (game.game_over()) {
-                statusDiv.className = 'status game-over';
-                if (game.in_checkmate()) {
-                    status = game.turn() === 'w' ? '🏆 Black wins by checkmate!' : '🏆 White wins by checkmate!';
-                } else if (game.in_draw()) {
-                    status = '🤝 Game drawn';
-                } else if (game.in_stalemate()) {
-                    status = '😐 Stalemate';
-                }
-            } else {
-                if (game.turn() === 'w') {
-                    statusDiv.className = 'status your-turn';
-                    status = '🎯 Your turn - Play as White';
-                } else {
-                    statusDiv.className = 'status opponent-turn';
-                    status = '🤖 Computer is thinking...';
+        // Prevent page scroll during board interaction
+        document.addEventListener('touchmove', function (e) {
+            if (isDragging || e.target.closest('#board-container')) {
+                e.preventDefault();
+            }
+        }, { passive: false });
+
+        // Translations
+        var translations = {
+            en: {
+                title: '♟️ Italian Opening',
+                subtitle: 'Master the Italian Game',
+                yourTurn: '🎯 Your turn - Play ',
+                correct: '✅ Perfect!',
+                wrong: '❌ Wrong! Try ',
+                complete: '🎉 Complete! You mastered it!',
+                explanationTitle: '💡 Explanation',
+                resetBtn: '🔄 Restart',
+                historyTitle: '📝 Moves',
+                noMoves: 'No moves yet'
+            },
+            fr: {
+                title: '♟️ Ouverture Italienne',
+                subtitle: 'Maîtrise l\'Italienne',
+                yourTurn: '🎯 À toi - Joue ',
+                correct: '✅ Parfait !',
+                wrong: '❌ Erreur ! Joue ',
+                complete: '🎉 Terminé ! Tu maîtrises !',
+                explanationTitle: '💡 Explication',
+                resetBtn: '🔄 Recommencer',
+                historyTitle: '📝 Coups',
+                noMoves: 'Aucun coup'
+            }
+        };
+
+        // Italian Opening moves
+        var italianOpening = [
+            { move: 'e4', explanation: { en: 'Control the center and open lines.', fr: 'Contrôle du centre et ouverture des lignes.' }, isWhite: true },
+            { move: 'e5', explanation: { en: 'Black responds symmetrically.', fr: 'Les noirs répondent symétriquement.' }, isWhite: false },
+            { move: 'Nf3', explanation: { en: 'Develop and attack e5.', fr: 'Développement et attaque de e5.' }, isWhite: true },
+            { move: 'Nc6', explanation: { en: 'Defend the pawn.', fr: 'Défense du pion.' }, isWhite: false },
+            { move: 'Bc4', explanation: { en: 'The Italian Bishop! Aim at f7.', fr: 'Le Fou italien ! Vise f7.' }, isWhite: true },
+            { move: 'Bc5', explanation: { en: 'Symmetric development.', fr: 'Développement symétrique.' }, isWhite: false },
+            { move: 'c3', explanation: { en: 'Prepare d4 for center control.', fr: 'Prépare d4 pour le centre.' }, isWhite: true },
+            { move: 'Nf6', explanation: { en: 'Attack e4.', fr: 'Attaque e4.' }, isWhite: false },
+            { move: 'd4', explanation: { en: 'Center explosion!', fr: 'Explosion au centre !' }, isWhite: true },
+            { move: 'exd4', explanation: { en: 'Black captures.', fr: 'Les noirs prennent.' }, isWhite: false },
+            { move: 'cxd4', explanation: { en: 'Recapture maintaining center.', fr: 'Reprise en maintenant le centre.' }, isWhite: true },
+            { move: 'Bb4+', explanation: { en: 'Check to disrupt.', fr: 'Échec pour perturber.' }, isWhite: false },
+            { move: 'Nc3', explanation: { en: 'Block and develop.', fr: 'Bloque et développe.' }, isWhite: true },
+            { move: 'Nxe4', explanation: { en: 'Take the pawn.', fr: 'Prend le pion.' }, isWhite: false },
+            { move: 'O-O', explanation: { en: 'Castle for safety!', fr: 'Roque pour la sécurité !' }, isWhite: true },
+            { move: 'Bxc3', explanation: { en: 'Exchange pieces.', fr: 'Échange de pièces.' }, isWhite: false },
+            { move: 'd5', explanation: { en: 'Gain space.', fr: 'Gagne de l\'espace.' }, isWhite: true },
+            { move: 'Bf6', explanation: { en: 'Retreat the bishop.', fr: 'Recule le fou.' }, isWhite: false },
+            { move: 'Re1', explanation: { en: 'Activate the rook.', fr: 'Active la tour.' }, isWhite: true },
+            { move: 'Ne7', explanation: { en: 'Retreat the knight.', fr: 'Recule le cavalier.' }, isWhite: false }
+        ];
+
+        function setLanguage(lang) {
+            currentLanguage = lang;
+
+            document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+
+            document.getElementById('title').textContent = translations[lang].title;
+            document.getElementById('subtitle').textContent = translations[lang].subtitle;
+            document.getElementById('explanationTitle').textContent = translations[lang].explanationTitle;
+            document.getElementById('resetBtn').textContent = translations[lang].resetBtn;
+            document.getElementById('historyTitle').textContent = translations[lang].historyTitle;
+
+            if (currentMoveIndex < italianOpening.length) {
+                var nextMove = italianOpening[currentMoveIndex];
+                if (nextMove.isWhite) {
+                    updateStatus(translations[lang].yourTurn + nextMove.move, 'your-turn');
                 }
             }
-            
-            document.getElementById('status').innerHTML = status;
-            document.getElementById('moveNumber').textContent = Math.floor(game.history().length / 2) + 1;
-            document.getElementById('toPlay').textContent = game.turn() === 'w' ? 'White' : 'Black';
-            
+
             updateMoveHistory();
+        }
+
+        function updateStatus(message, className) {
+            var statusDiv = document.getElementById('status');
+            statusDiv.innerHTML = message;
+            statusDiv.className = 'status ' + className;
+        }
+
+        function showExplanation(text) {
+            document.getElementById('explanationText').textContent = text;
+            document.getElementById('explanation').style.display = 'block';
+        }
+
+        function hideExplanation() {
+            document.getElementById('explanation').style.display = 'none';
         }
 
         function updateMoveHistory() {
             var history = game.history();
             var html = '';
-            
+
             for (var i = 0; i < history.length; i += 2) {
                 var moveNum = Math.floor(i / 2) + 1;
                 var white = history[i];
                 var black = history[i + 1] || '';
                 html += '<div class="move-item">' + moveNum + '. ' + white + (black ? ' ' + black : '') + '</div>';
             }
-            
-            document.getElementById('moveList').innerHTML = html || '<span style="color: #94a3b8;">No moves yet</span>';
+
+            document.getElementById('moveList').innerHTML = html || '<span style="color: #94a3b8;">' + translations[currentLanguage].noMoves + '</span>';
         }
 
-        function makeRandomMove() {
-            var possibleMoves = game.moves();
-            
-            if (possibleMoves.length === 0) return;
-            
-            var randomIdx = Math.floor(Math.random() * possibleMoves.length);
-            game.move(possibleMoves[randomIdx]);
-            board.position(game.fen());
-            updateStatus();
+        function makeComputerMove() {
+            if (currentMoveIndex >= italianOpening.length) {
+                updateStatus(translations[currentLanguage].complete, 'correct');
+                return;
+            }
+
+            var expectedMove = italianOpening[currentMoveIndex];
+
+            if (!expectedMove.isWhite) {
+                setTimeout(function () {
+                    game.move(expectedMove.move);
+                    board.position(game.fen());
+                    showExplanation(expectedMove.explanation[currentLanguage]);
+                    updateMoveHistory();
+                    currentMoveIndex++;
+
+                    if (currentMoveIndex < italianOpening.length) {
+                        var nextMove = italianOpening[currentMoveIndex];
+                        updateStatus(translations[currentLanguage].yourTurn + nextMove.move, 'your-turn');
+                    } else {
+                        updateStatus(translations[currentLanguage].complete, 'correct');
+                    }
+                }, 600);
+            }
         }
 
         function onDragStart(source, piece, position, orientation) {
-            if (game.game_over()) return false;
-            if (game.turn() === 'b') return false;
+            isDragging = true;
+            document.body.classList.add('dragging');
+
+            if (currentMoveIndex >= italianOpening.length) return false;
+
+            var expectedMove = italianOpening[currentMoveIndex];
+            if (!expectedMove.isWhite) return false;
             if (piece.search(/^b/) !== -1) return false;
         }
 
         function onDrop(source, target) {
+            isDragging = false;
+            document.body.classList.remove('dragging');
+
+            if (currentMoveIndex >= italianOpening.length) return 'snapback';
+
+            var expectedMove = italianOpening[currentMoveIndex];
+
             var move = game.move({
                 from: source,
                 to: target,
@@ -337,28 +518,35 @@
 
             if (move === null) return 'snapback';
 
-            updateStatus();
-            
-            window.setTimeout(makeRandomMove, 500);
+            if (move.san === expectedMove.move) {
+                updateStatus(translations[currentLanguage].correct, 'correct');
+                showExplanation(expectedMove.explanation[currentLanguage]);
+                updateMoveHistory();
+                currentMoveIndex++;
+
+                setTimeout(function () {
+                    makeComputerMove();
+                }, 1000);
+            } else {
+                game.undo();
+                updateStatus(translations[currentLanguage].wrong + expectedMove.move, 'wrong');
+                return 'snapback';
+            }
         }
 
         function onSnapEnd() {
+            isDragging = false;
+            document.body.classList.remove('dragging');
             board.position(game.fen());
         }
 
         function resetGame() {
             game.reset();
             board.start();
-            updateStatus();
-        }
-
-        function undoMove() {
-            game.undo();
-            if (game.turn() === 'b') {
-                game.undo();
-            }
-            board.position(game.fen());
-            updateStatus();
+            currentMoveIndex = 0;
+            hideExplanation();
+            updateStatus(translations[currentLanguage].yourTurn + 'e4', 'your-turn');
+            updateMoveHistory();
         }
 
         var config = {
@@ -367,13 +555,16 @@
             onDragStart: onDragStart,
             onDrop: onDrop,
             onSnapEnd: onSnapEnd,
-            pieceTheme: 'https://chessboardjs.com/img/chesspieces/wikipedia/{piece}.png'
+            pieceTheme: 'https://chessboardjs.com/img/chesspieces/wikipedia/{piece}.png',
+            snapbackSpeed: 100,
+            snapSpeed: 100
         };
 
         board = Chessboard('board', config);
-        updateStatus();
+        updateMoveHistory();
 
         $(window).resize(board.resize);
     </script>
 </body>
+
 </html>
