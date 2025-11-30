@@ -102,6 +102,48 @@
             padding-bottom: 100px;
         }
 
+        .score-panel {
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(20px);
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 20px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+        }
+
+        .score-item {
+            text-align: center;
+            padding: 12px;
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            border-radius: 12px;
+        }
+
+        .score-label {
+            font-size: 11px;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .score-value {
+            font-size: 24px;
+            font-weight: 800;
+            color: #1e293b;
+        }
+
+        .score-value.correct {
+            color: #10b981;
+        }
+
+        .score-value.wrong {
+            color: #ef4444;
+        }
+
         .status {
             text-align: center;
             padding: 16px 20px;
@@ -157,12 +199,22 @@
             touch-action: none;
         }
 
-        /* Prevent board from moving on touch */
         #board * {
             touch-action: none !important;
             -webkit-touch-callout: none;
             -webkit-user-select: none;
             user-select: none;
+        }
+
+        /* Highlight possible moves */
+        .highlight-square {
+            box-shadow: inset 0 0 0 4px rgba(102, 126, 234, 0.8) !important;
+            background-color: rgba(102, 126, 234, 0.2) !important;
+        }
+
+        .selected-square {
+            box-shadow: inset 0 0 0 4px #667eea !important;
+            background-color: rgba(102, 126, 234, 0.3) !important;
         }
 
         .explanation {
@@ -189,6 +241,67 @@
             font-size: 14px;
             line-height: 1.7;
             font-weight: 500;
+        }
+
+        .final-report {
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(20px);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+        }
+
+        .final-report h3 {
+            color: #667eea;
+            font-size: 16px;
+            margin-bottom: 15px;
+            text-align: center;
+            font-weight: 800;
+        }
+
+        .report-score {
+            text-align: center;
+            font-size: 48px;
+            font-weight: 800;
+            margin-bottom: 15px;
+        }
+
+        .report-score.perfect {
+            color: #10b981;
+        }
+
+        .report-score.good {
+            color: #f59e0b;
+        }
+
+        .report-score.needs-work {
+            color: #ef4444;
+        }
+
+        .mistakes-list {
+            background: #fef2f2;
+            border-radius: 12px;
+            padding: 15px;
+            margin-top: 15px;
+        }
+
+        .mistakes-list h4 {
+            color: #dc2626;
+            font-size: 13px;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .mistake-item {
+            background: white;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            font-size: 13px;
+            color: #475569;
+            border-left: 3px solid #ef4444;
         }
 
         .controls {
@@ -257,12 +370,6 @@
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
         }
 
-        /* Improve touch targets */
-        .chessboard-63f37 .square-55d63 {
-            touch-action: none !important;
-        }
-
-        /* Smooth animations */
         @keyframes fadeIn {
             from {
                 opacity: 0;
@@ -276,20 +383,9 @@
         }
 
         .explanation,
-        .move-history {
+        .move-history,
+        .final-report {
             animation: fadeIn 0.4s ease-out;
-        }
-
-        /* Loading state */
-        .loading {
-            opacity: 0.6;
-            pointer-events: none;
-        }
-
-        /* Prevent text selection during drag */
-        .dragging * {
-            user-select: none !important;
-            -webkit-user-select: none !important;
         }
 
         @media (max-width: 380px) {
@@ -321,6 +417,17 @@
         </div>
 
         <div class="content">
+            <div class="score-panel">
+                <div class="score-item">
+                    <div class="score-label" id="correctLabel">Correct</div>
+                    <div class="score-value correct" id="correctScore">0</div>
+                </div>
+                <div class="score-item">
+                    <div class="score-label" id="wrongLabel">Errors</div>
+                    <div class="score-value wrong" id="wrongScore">0</div>
+                </div>
+            </div>
+
             <div id="status" class="status your-turn">
                 🎯 Your turn - Play e4
             </div>
@@ -332,6 +439,16 @@
             <div class="explanation" id="explanation" style="display: none;">
                 <h3 id="explanationTitle">💡 Explanation</h3>
                 <p id="explanationText"></p>
+            </div>
+
+            <div class="final-report" id="finalReport" style="display: none;">
+                <h3 id="reportTitle">📊 Training Complete!</h3>
+                <div class="report-score" id="reportScore">100%</div>
+                <p id="reportMessage" style="text-align: center; color: #475569; margin-bottom: 10px;"></p>
+                <div class="mistakes-list" id="mistakesList" style="display: none;">
+                    <h4 id="mistakesTitle">⚠️ Mistakes to Review:</h4>
+                    <div id="mistakesContent"></div>
+                </div>
             </div>
 
             <div class="move-history">
@@ -354,15 +471,17 @@
         var currentMoveIndex = 0;
         var currentLanguage = 'en';
         var isDragging = false;
+        var selectedSquare = null;
+        var correctMoves = 0;
+        var wrongMoves = 0;
+        var mistakes = [];
 
-        // Prevent page scroll during board interaction
         document.addEventListener('touchmove', function (e) {
             if (isDragging || e.target.closest('#board-container')) {
                 e.preventDefault();
             }
         }, { passive: false });
 
-        // Translations
         var translations = {
             en: {
                 title: '♟️ Italian Opening',
@@ -370,11 +489,20 @@
                 yourTurn: '🎯 Your turn - Play ',
                 correct: '✅ Perfect!',
                 wrong: '❌ Wrong! Try ',
-                complete: '🎉 Complete! You mastered it!',
+                complete: '🎉 Training Complete!',
                 explanationTitle: '💡 Explanation',
                 resetBtn: '🔄 Restart',
                 historyTitle: '📝 Moves',
-                noMoves: 'No moves yet'
+                noMoves: 'No moves yet',
+                correctLabel: 'Correct',
+                wrongLabel: 'Errors',
+                reportTitle: '📊 Training Complete!',
+                perfectScore: 'Perfect! No mistakes!',
+                goodScore: 'Good job! Review your mistakes.',
+                needsWork: 'Keep practicing! Review these moves:',
+                mistakesTitle: '⚠️ Mistakes to Review:',
+                youPlayed: 'You played',
+                shouldBe: 'Should be'
             },
             fr: {
                 title: '♟️ Ouverture Italienne',
@@ -382,15 +510,23 @@
                 yourTurn: '🎯 À toi - Joue ',
                 correct: '✅ Parfait !',
                 wrong: '❌ Erreur ! Joue ',
-                complete: '🎉 Terminé ! Tu maîtrises !',
+                complete: '🎉 Entraînement Terminé !',
                 explanationTitle: '💡 Explication',
                 resetBtn: '🔄 Recommencer',
                 historyTitle: '📝 Coups',
-                noMoves: 'Aucun coup'
+                noMoves: 'Aucun coup',
+                correctLabel: 'Corrects',
+                wrongLabel: 'Erreurs',
+                reportTitle: '📊 Entraînement Terminé !',
+                perfectScore: 'Parfait ! Aucune erreur !',
+                goodScore: 'Bon travail ! Révise tes erreurs.',
+                needsWork: 'Continue ! Révise ces coups :',
+                mistakesTitle: '⚠️ Erreurs à Réviser :',
+                youPlayed: 'Tu as joué',
+                shouldBe: 'Devrait être'
             }
         };
 
-        // Italian Opening moves
         var italianOpening = [
             { move: 'e4', explanation: { en: 'Control the center and open lines.', fr: 'Contrôle du centre et ouverture des lignes.' }, isWhite: true },
             { move: 'e5', explanation: { en: 'Black responds symmetrically.', fr: 'Les noirs répondent symétriquement.' }, isWhite: false },
@@ -425,6 +561,8 @@
             document.getElementById('explanationTitle').textContent = translations[lang].explanationTitle;
             document.getElementById('resetBtn').textContent = translations[lang].resetBtn;
             document.getElementById('historyTitle').textContent = translations[lang].historyTitle;
+            document.getElementById('correctLabel').textContent = translations[lang].correctLabel;
+            document.getElementById('wrongLabel').textContent = translations[lang].wrongLabel;
 
             if (currentMoveIndex < italianOpening.length) {
                 var nextMove = italianOpening[currentMoveIndex];
@@ -442,6 +580,11 @@
             statusDiv.className = 'status ' + className;
         }
 
+        function updateScore() {
+            document.getElementById('correctScore').textContent = correctMoves;
+            document.getElementById('wrongScore').textContent = wrongMoves;
+        }
+
         function showExplanation(text) {
             document.getElementById('explanationText').textContent = text;
             document.getElementById('explanation').style.display = 'block';
@@ -449,6 +592,47 @@
 
         function hideExplanation() {
             document.getElementById('explanation').style.display = 'none';
+        }
+
+        function showFinalReport() {
+            var totalMoves = correctMoves + wrongMoves;
+            var percentage = totalMoves > 0 ? Math.round((correctMoves / totalMoves) * 100) : 100;
+
+            var reportScore = document.getElementById('reportScore');
+            reportScore.textContent = percentage + '%';
+
+            if (percentage === 100) {
+                reportScore.className = 'report-score perfect';
+                document.getElementById('reportMessage').textContent = translations[currentLanguage].perfectScore;
+                document.getElementById('mistakesList').style.display = 'none';
+            } else if (percentage >= 70) {
+                reportScore.className = 'report-score good';
+                document.getElementById('reportMessage').textContent = translations[currentLanguage].goodScore;
+                showMistakes();
+            } else {
+                reportScore.className = 'report-score needs-work';
+                document.getElementById('reportMessage').textContent = translations[currentLanguage].needsWork;
+                showMistakes();
+            }
+
+            document.getElementById('reportTitle').textContent = translations[currentLanguage].reportTitle;
+            document.getElementById('finalReport').style.display = 'block';
+        }
+
+        function showMistakes() {
+            if (mistakes.length === 0) return;
+
+            var html = '';
+            mistakes.forEach(function (mistake) {
+                html += '<div class="mistake-item">';
+                html += '<strong>' + translations[currentLanguage].youPlayed + ':</strong> ' + mistake.played + '<br>';
+                html += '<strong>' + translations[currentLanguage].shouldBe + ':</strong> ' + mistake.correct;
+                html += '</div>';
+            });
+
+            document.getElementById('mistakesTitle').textContent = translations[currentLanguage].mistakesTitle;
+            document.getElementById('mistakesContent').innerHTML = html;
+            document.getElementById('mistakesList').style.display = 'block';
         }
 
         function updateMoveHistory() {
@@ -465,9 +649,87 @@
             document.getElementById('moveList').innerHTML = html || '<span style="color: #94a3b8;">' + translations[currentLanguage].noMoves + '</span>';
         }
 
+        function removeHighlights() {
+            $('#board .square-55d63').removeClass('highlight-square selected-square');
+        }
+
+        function highlightSquare(square) {
+            var squareEl = $('#board .square-' + square);
+            squareEl.addClass('selected-square');
+        }
+
+        function highlightPossibleMoves(square) {
+            var moves = game.moves({ square: square, verbose: true });
+
+            moves.forEach(function (move) {
+                var squareEl = $('#board .square-' + move.to);
+                squareEl.addClass('highlight-square');
+            });
+        }
+
+        function onSquareClick(square) {
+            if (currentMoveIndex >= italianOpening.length) return;
+
+            var expectedMove = italianOpening[currentMoveIndex];
+            if (!expectedMove.isWhite) return;
+
+            removeHighlights();
+
+            var piece = game.get(square);
+
+            if (selectedSquare === null) {
+                if (piece && piece.color === 'w') {
+                    selectedSquare = square;
+                    highlightSquare(square);
+                    highlightPossibleMoves(square);
+                }
+            } else {
+                var move = game.move({
+                    from: selectedSquare,
+                    to: square,
+                    promotion: 'q'
+                });
+
+                if (move === null) {
+                    selectedSquare = null;
+                    if (piece && piece.color === 'w') {
+                        selectedSquare = square;
+                        highlightSquare(square);
+                        highlightPossibleMoves(square);
+                    }
+                } else {
+                    selectedSquare = null;
+                    board.position(game.fen());
+
+                    if (move.san === expectedMove.move) {
+                        correctMoves++;
+                        updateScore();
+                        updateStatus(translations[currentLanguage].correct, 'correct');
+                        showExplanation(expectedMove.explanation[currentLanguage]);
+                        updateMoveHistory();
+                        currentMoveIndex++;
+
+                        setTimeout(function () {
+                            makeComputerMove();
+                        }, 1000);
+                    } else {
+                        wrongMoves++;
+                        updateScore();
+                        mistakes.push({
+                            played: move.san,
+                            correct: expectedMove.move
+                        });
+                        game.undo();
+                        board.position(game.fen());
+                        updateStatus(translations[currentLanguage].wrong + expectedMove.move, 'wrong');
+                    }
+                }
+            }
+        }
+
         function makeComputerMove() {
             if (currentMoveIndex >= italianOpening.length) {
-                updateStatus(translations[currentLanguage].complete, 'correct');
+                showFinalReport();
                 return;
             }
 
@@ -485,7 +747,7 @@
                         var nextMove = italianOpening[currentMoveIndex];
                         updateStatus(translations[currentLanguage].yourTurn + nextMove.move, 'your-turn');
                     } else {
-                        updateStatus(translations[currentLanguage].complete, 'correct');
+                        showFinalReport();
                     }
                 }, 600);
             }
@@ -493,7 +755,6 @@
 
         function onDragStart(source, piece, position, orientation) {
             isDragging = true;
-            document.body.classList.add('dragging');
 
             if (currentMoveIndex >= italianOpening.length) return false;
 
@@ -504,7 +765,7 @@
 
         function onDrop(source, target) {
             isDragging = false;
-            document.body.classList.remove('dragging');
+            removeHighlights();
 
             if (currentMoveIndex >= italianOpening.length) return 'snapback';
 
@@ -519,6 +780,8 @@
             if (move === null) return 'snapback';
 
             if (move.san === expectedMove.move) {
+                correctMoves++;
+                updateScore();
                 updateStatus(translations[currentLanguage].correct, 'correct');
                 showExplanation(expectedMove.explanation[currentLanguage]);
                 updateMoveHistory();
@@ -528,6 +791,12 @@
                     makeComputerMove();
                 }, 1000);
             } else {
+                wrongMoves++;
+                updateScore();
+                mistakes.push({
+                    played: move.san,
+                    correct: expectedMove.move
+                });
                 game.undo();
                 updateStatus(translations[currentLanguage].wrong + expectedMove.move, 'wrong');
                 return 'snapback';
@@ -536,7 +805,6 @@
 
         function onSnapEnd() {
             isDragging = false;
-            document.body.classList.remove('dragging');
             board.position(game.fen());
         }
 
@@ -544,9 +812,16 @@
             game.reset();
             board.start();
             currentMoveIndex = 0;
+            correctMoves = 0;
+            wrongMoves = 0;
+            mistakes = [];
+            selectedSquare = null;
             hideExplanation();
+            updateScore();
             updateStatus(translations[currentLanguage].yourTurn + 'e4', 'your-turn');
             updateMoveHistory();
+            removeHighlights();
+            document.getElementById('finalReport').style.display = 'none';
         }
 
         var config = {
@@ -561,7 +836,14 @@
         };
 
         board = Chessboard('board', config);
+
+        $('#board').on('click', '.square-55d63', function (e) {
+            var square = $(this).attr('data-square');
+            onSquareClick(square);
+        });
+
         updateMoveHistory();
+        updateScore();
 
         $(window).resize(board.resize);
     </script>
