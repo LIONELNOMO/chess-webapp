@@ -364,11 +364,16 @@
     <div class="app-container">
         <div class="header">
             <h1 id="title">♟️ Sicilian Defense</h1>
-            <p class="subtitle" id="subtitle">Master the Sicilian</p>
+            <p class="subtitle" id="subtitle">Master the Italian Game</p>
 
             <div class="language-selector">
                 <button class="lang-btn active" onclick="setLanguage('en')">🇬🇧 English</button>
                 <button class="lang-btn" onclick="setLanguage('fr')">🇫🇷 Français</button>
+            </div>
+
+            <div class="side-selector" style="margin-top: 10px; display: flex; gap: 10px; justify-content: center;">
+                <button class="lang-btn active" id="btn-side-w" onclick="setSide('w')">⚪ White</button>
+                <button class="lang-btn" id="btn-side-b" onclick="setSide('b')">⚫ Black</button>
             </div>
 
             <div class="variation-selector">
@@ -420,7 +425,7 @@
         var translations = {
             en: {
                 title: '♟️ Sicilian Defense',
-                subtitle: 'Master the Sicilian',
+                subtitle: 'Master the Italian Game',
                 yourTurn: '🎯 Your turn - Play ',
                 correct: '✅ Perfect!',
                 wrong: '❌ Wrong! Try ',
@@ -432,13 +437,13 @@
                 completionMessage: 'Congratulations! You have completed this variation.',
                 variations: {
                     sicilian_najdorf: 'Najdorf',
-                    sicilian_closed: 'Closed Sicilian',
+                    two_knights: 'Two Knights',
                     sicilian_alapin: 'Alapin'
                 }
             },
             fr: {
                 title: '♟️ Défense Sicilienne',
-                subtitle: 'Maîtrise la Sicilienne',
+                subtitle: 'Maîtrise l\'Italienne',
                 yourTurn: '🎯 À toi - Joue ',
                 correct: '✅ Parfait !',
                 wrong: '❌ Erreur ! Joue ',
@@ -457,41 +462,363 @@
         };
 
         var variations = {
-            'sicilian_najdorf': [
-                { move: 'e4', explanation: { en: 'Control the center.', fr: 'Contrôle du centre.' }, isWhite: true },
-                { move: 'c5', explanation: { en: 'The Sicilian! Control d4 from the flank.', fr: 'La Sicilienne ! Contrôle d4 depuis l\'aile.' }, isWhite: false },
-                { move: 'Nf3', explanation: { en: 'Prepare d4.', fr: 'Prépare d4.' }, isWhite: true },
-                { move: 'd6', explanation: { en: 'Control e5 and prevent e5.', fr: 'Contrôle e5 et empêche e5.' }, isWhite: false },
-                { move: 'd4', explanation: { en: 'Open the center.', fr: 'Ouvre le centre.' }, isWhite: true },
-                { move: 'cxd4', explanation: { en: 'Central exchange.', fr: 'Échange central.' }, isWhite: false },
-                { move: 'Nxd4', explanation: { en: 'Recapture.', fr: 'Reprise.' }, isWhite: true },
-                { move: 'Nf6', explanation: { en: 'Attack e4.', fr: 'Attaque e4.' }, isWhite: false },
-                { move: 'Nc3', explanation: { en: 'Defend e4.', fr: 'Défend e4.' }, isWhite: true },
-                { move: 'a6', explanation: { en: 'The Najdorf mark! Prevents Bb5/Nb5.', fr: 'La marque de la Najdorf ! Empêche Bb5/Nb5.' }, isWhite: false }
+            "sicilian_najdorf": [
+                {
+                    "move": "e4",
+                    "explanation": {
+                        "fr": "Les blancs occupent le centre avec le pion roi, ouvrant les diagonales pour le fou et la dame. C'est le coup le plus populaire au niveau mondial.",
+                        "en": "White occupies the center with the king's pawn, opening diagonals for the bishop and queen. This is the most popular move worldwide."
+                    },
+                    "isWhite": true
+                },
+                {
+                    "move": "c5",
+                    "explanation": {
+                        "fr": "La Sicilienne ! Les noirs refusent la symétrie et contrôlent d4 depuis l'aile. C'est l'ouverture la plus combative et la plus jouée au plus haut niveau.",
+                        "en": "The Sicilian! Black refuses symmetry and controls d4 from the flank. This is the most combative and most played opening at the highest level."
+                    },
+                    "isWhite": false
+                },
+                {
+                    "move": "Nf3",
+                    "explanation": {
+                        "fr": "Développement naturel du cavalier qui attaque e5 et prépare d4. Les blancs évitent les pièges tactiques comme 2.Nf3 d5!",
+                        "en": "Natural knight development attacking e5 and preparing d4. White avoids tactical traps like 2.Nf3 d5!"
+                    },
+                    "isWhite": true
+                },
+                {
+                    "move": "d6",
+                    "explanation": {
+                        "fr": "Les noirs solidifient e5 et préparent Nf6. Cette structure flexible permet plusieurs plans : ...Nf6, ...g6 (Dragon), ou ...e6 (Scheveningen).",
+                        "en": "Black solidifies e5 and prepares Nf6. This flexible structure allows several plans: ...Nf6, ...g6 (Dragon), or ...e6 (Scheveningen)."
+                    },
+                    "isWhite": false
+                },
+                {
+                    "move": "d4",
+                    "explanation": {
+                        "fr": "Les blancs ouvrent le centre et libèrent le fou c1. C'est le moment critique : les noirs doivent échanger pour éviter d5 qui bloquerait tout.",
+                        "en": "White opens the center and frees the c1 bishop. This is the critical moment: Black must exchange to avoid d5 which would block everything."
+                    },
+                    "isWhite": true
+                },
+                {
+                    "move": "cxd4",
+                    "explanation": {
+                        "fr": "Échange obligatoire. Les noirs obtiennent une majorité de pions à l'aile dame (a+b contre a seul), base de leur contre-jeu futur.",
+                        "en": "Forced exchange. Black obtains a pawn majority on the queenside (a+b vs a alone), the basis of their future counterplay."
+                    },
+                    "isWhite": false
+                },
+                {
+                    "move": "Nxd4",
+                    "explanation": {
+                        "fr": "Le cavalier se centralise magnifiquement sur d4, case idéale d'où il contrôle 8 cases importantes. Les blancs ont un léger avantage d'espace.",
+                        "en": "The knight centralizes magnificently on d4, an ideal square from which it controls 8 important squares. White has a slight space advantage."
+                    },
+                    "isWhite": true
+                },
+                {
+                    "move": "Nf6",
+                    "explanation": {
+                        "fr": "Développement actif qui attaque e4 et prépare le petit roque. Les noirs menacent déjà de prendre le pion central.",
+                        "en": "Active development attacking e4 and preparing short castle. Black already threatens to take the central pawn."
+                    },
+                    "isWhite": false
+                },
+                {
+                    "move": "Nc3",
+                    "explanation": {
+                        "fr": "Les blancs défendent e4 et développent une pièce. Le cavalier vise d5 et peut sauter en b5 dans certaines variantes.",
+                        "en": "White defends e4 and develops a piece. The knight eyes d5 and can jump to b5 in certain variations."
+                    },
+                    "isWhite": true
+                },
+                {
+                    "move": "a6",
+                    "explanation": {
+                        "fr": "LE COUP NAJDORF ! Cette prophylaxie empêche Nb5 et Bb5, donnant aux noirs un contrôle total de b5. C'est la marque de fabrique de cette variante.",
+                        "en": "THE NAJDORF MOVE! This prophylaxis prevents Nb5 and Bb5, giving Black total control of b5. This is the trademark of this variation."
+                    },
+                    "isWhite": false
+                },
+                {
+                    "move": "Be3",
+                    "explanation": {
+                        "fr": "Développement solide du fou qui prépare f3 et Qd2. Les blancs visent un plan avec O-O-O et attaque à l'aile roi.",
+                        "en": "Solid bishop development preparing f3 and Qd2. White aims for a plan with O-O-O and kingside attack."
+                    },
+                    "isWhite": true
+                },
+                {
+                    "move": "e5",
+                    "explanation": {
+                        "fr": "Les noirs gagnent de l'espace et chassent le cavalier d4. Attention : ce coup affaiblit d5 et d6, il faut bien calculer.",
+                        "en": "Black gains space and kicks the d4 knight. Caution: this move weakens d5 and d6, calculation is needed."
+                    },
+                    "isWhite": false
+                },
+                {
+                    "move": "Nf3",
+                    "explanation": {
+                        "fr": "Retraite flexible. Le cavalier peut rebondir en d4 via h4 ou g5. Les blancs maintiennent la tension.",
+                        "en": "Flexible retreat. The knight can bounce back to d4 via h4 or g5. White maintains tension."
+                    },
+                    "isWhite": true
+                },
+                {
+                    "move": "Be7",
+                    "explanation": {
+                        "fr": "Développement calme qui prépare O-O. Les noirs peuvent aussi jouer ...Qc7 pour contrôler e5 et préparer ...Nbd7.",
+                        "en": "Calm development preparing O-O. Black can also play ...Qc7 to control e5 and prepare ...Nbd7."
+                    },
+                    "isWhite": false
+                },
+                {
+                    "move": "Bc4",
+                    "explanation": {
+                        "fr": "Le fou italien vise f7, le point faible chronique des noirs. Les blancs préparent O-O et gardent des options tactiques.",
+                        "en": "The Italian bishop aims at f7, Black's chronic weak point. White prepares O-O and keeps tactical options."
+                    },
+                    "isWhite": true
+                }
             ],
-            'sicilian_closed': [
-                { move: 'e4', explanation: { en: 'Control the center.', fr: 'Contrôle du centre.' }, isWhite: true },
-                { move: 'c5', explanation: { en: 'The Sicilian.', fr: 'La Sicilienne.' }, isWhite: false },
-                { move: 'Nc3', explanation: { en: 'Closed Sicilian. No immediate d4.', fr: 'Sicilienne Fermée. Pas de d4 immédiat.' }, isWhite: true },
-                { move: 'Nc6', explanation: { en: 'Development.', fr: 'Développement.' }, isWhite: false },
-                { move: 'g3', explanation: { en: 'Preparing the fianchetto.', fr: 'Le fianchetto se prépare.' }, isWhite: true },
-                { move: 'g6', explanation: { en: 'Black does the same.', fr: 'Les noirs font de même.' }, isWhite: false },
-                { move: 'Bg2', explanation: { en: 'Controls the long diagonal.', fr: 'Contrôle la grande diagonale.' }, isWhite: true },
-                { move: 'Bg7', explanation: { en: 'Controls the long diagonal.', fr: 'Contrôle la grande diagonale.' }, isWhite: false },
-                { move: 'd3', explanation: { en: 'Solid.', fr: 'Solide.' }, isWhite: true },
-                { move: 'd6', explanation: { en: 'Solid.', fr: 'Solide.' }, isWhite: false }
+            "sicilian_closed": [
+                {
+                    "move": "e4",
+                    "explanation": {
+                        "fr": "Occupation centrale classique. Les blancs ouvrent les lignes pour leurs pièces et prennent l'initiative.",
+                        "en": "Classical central occupation. White opens lines for their pieces and takes the initiative."
+                    },
+                    "isWhite": true
+                },
+                {
+                    "move": "c5",
+                    "explanation": {
+                        "fr": "La Sicilienne ! Les noirs évitent la symétrie et créent un déséquilibre immédiat. Ils visent le contre-jeu à l'aile dame.",
+                        "en": "The Sicilian! Black avoids symmetry and creates immediate imbalance. They aim for queenside counterplay."
+                    },
+                    "isWhite": false
+                },
+                {
+                    "move": "Nc3",
+                    "explanation": {
+                        "fr": "Système fermé ! Les blancs évitent d4 et visent un jeu positionnel avec g3, Bg2, d3. C'est plus calme mais très venimeux.",
+                        "en": "Closed system! White avoids d4 and aims for positional play with g3, Bg2, d3. It's calmer but very venomous."
+                    },
+                    "isWhite": true
+                },
+                {
+                    "move": "Nc6",
+                    "explanation": {
+                        "fr": "Développement naturel qui contrôle d4 et e5. Les noirs restent flexibles : ...g6, ...e6 ou ...d6 sont tous possibles.",
+                        "en": "Natural development controlling d4 and e5. Black remains flexible: ...g6, ...e6 or ...d6 are all possible."
+                    },
+                    "isWhite": false
+                },
+                {
+                    "move": "g3",
+                    "explanation": {
+                        "fr": "Les blancs préparent le fianchetto du fou roi. Sur la grande diagonale a1-h8, ce fou deviendra une pièce monstre.",
+                        "en": "White prepares the king's bishop fianchetto. On the long diagonal a1-h8, this bishop will become a monster piece."
+                    },
+                    "isWhite": true
+                },
+                {
+                    "move": "g6",
+                    "explanation": {
+                        "fr": "Les noirs imitent ! Le Dragon fermé naît. Les deux camps vont se battre sur les grandes diagonales.",
+                        "en": "Black imitates! The Closed Dragon is born. Both sides will fight on the long diagonals."
+                    },
+                    "isWhite": false
+                },
+                {
+                    "move": "Bg2",
+                    "explanation": {
+                        "fr": "Le fou s'installe sur sa meilleure case. Il contrôle d5, e4, f3 et participe à la défense du roi.",
+                        "en": "The bishop settles on its best square. It controls d5, e4, f3 and participates in king defense."
+                    },
+                    "isWhite": true
+                },
+                {
+                    "move": "Bg7",
+                    "explanation": {
+                        "fr": "Symétrie parfaite. Le fou noir est aussi puissant, visant b2 et contrôlant la colonne h.",
+                        "en": "Perfect symmetry. The black bishop is equally powerful, aiming at b2 and controlling the h-file."
+                    },
+                    "isWhite": false
+                },
+                {
+                    "move": "d3",
+                    "explanation": {
+                        "fr": "Structure solide qui soutient e4 et prépare Be3. Les blancs jouent lentement mais sûrement.",
+                        "en": "Solid structure supporting e4 and preparing Be3. White plays slowly but surely."
+                    },
+                    "isWhite": true
+                },
+                {
+                    "move": "d6",
+                    "explanation": {
+                        "fr": "Les noirs font de même. La position est fermée, le milieu de jeu sera une bataille de manœuvres.",
+                        "en": "Black does the same. The position is closed, the middlegame will be a battle of maneuvers."
+                    },
+                    "isWhite": false
+                },
+                {
+                    "move": "Be3",
+                    "explanation": {
+                        "fr": "Développement qui prépare Qd2 et potentiellement Bh6 pour échanger les fous.",
+                        "en": "Development preparing Qd2 and potentially Bh6 to exchange bishops."
+                    },
+                    "isWhite": true
+                },
+                {
+                    "move": "Rb8",
+                    "explanation": {
+                        "fr": "Coup prophylactique typique ! Les noirs préparent ...b5-b4 pour chasser le cavalier c3.",
+                        "en": "Typical prophylactic move! Black prepares ...b5-b4 to chase the c3 knight."
+                    },
+                    "isWhite": false
+                },
+                {
+                    "move": "Qd2",
+                    "explanation": {
+                        "fr": "Les blancs connectent les tours et préparent Bh6. Le plan est d'échanger les fous de cases noires.",
+                        "en": "White connects the rooks and prepares Bh6. The plan is to exchange dark-squared bishops."
+                    },
+                    "isWhite": true
+                },
+                {
+                    "move": "b5",
+                    "explanation": {
+                        "fr": "Les noirs lancent leur contre-attaque ! Le pion b avance pour gagner de l'espace.",
+                        "en": "Black launches their counterattack! The b-pawn advances to gain space."
+                    },
+                    "isWhite": false
+                }
             ],
-            'sicilian_alapin': [
-                { move: 'e4', explanation: { en: 'Control the center.', fr: 'Contrôle du centre.' }, isWhite: true },
-                { move: 'c5', explanation: { en: 'The Sicilian.', fr: 'La Sicilienne.' }, isWhite: false },
-                { move: 'c3', explanation: { en: 'The Alapin. Prepares d4 for a strong center.', fr: 'L\'Alapin. Prépare d4 pour un fort centre.' }, isWhite: true },
-                { move: 'Nf6', explanation: { en: 'Attack e4.', fr: 'Attaque e4.' }, isWhite: false },
-                { move: 'e5', explanation: { en: 'Gain space and kick knight.', fr: 'Gagne de l\'espace et chasse le cavalier.' }, isWhite: true },
-                { move: 'Nd5', explanation: { en: 'Knight jumps to center.', fr: 'Le cavalier bondit au centre.' }, isWhite: false },
-                { move: 'd4', explanation: { en: 'Seizing the center.', fr: 'Prise du centre.' }, isWhite: true },
-                { move: 'cxd4', explanation: { en: 'Exchange.', fr: 'Échange.' }, isWhite: false },
-                { move: 'Nf3', explanation: { en: 'Development.', fr: 'Développement.' }, isWhite: true },
-                { move: 'e6', explanation: { en: 'Prepares development.', fr: 'Prépare le développement.' }, isWhite: false }
+            "sicilian_alapin": [
+                {
+                    "move": "e4",
+                    "explanation": {
+                        "fr": "Les blancs prennent le centre et ouvrent les lignes. Début classique et ambitieux.",
+                        "en": "White takes the center and opens lines. Classical and ambitious start."
+                    },
+                    "isWhite": true
+                },
+                {
+                    "move": "c5",
+                    "explanation": {
+                        "fr": "La Sicilienne ! Les noirs refusent la symétrie et visent un jeu déséquilibré.",
+                        "en": "The Sicilian! Black refuses symmetry and aims for unbalanced play."
+                    },
+                    "isWhite": false
+                },
+                {
+                    "move": "c3",
+                    "explanation": {
+                        "fr": "L'ALAPIN ! Les blancs évitent la théorie complexe de la Sicilienne Ouverte et visent un centre de pions massif avec d4.",
+                        "en": "THE ALAPIN! White avoids the complex theory of the Open Sicilian and aims for a massive pawn center with d4."
+                    },
+                    "isWhite": true
+                },
+                {
+                    "move": "Nf6",
+                    "explanation": {
+                        "fr": "Les noirs attaquent e4 immédiatement et développent une pièce. C'est la réponse la plus active.",
+                        "en": "Black attacks e4 immediately and develops a piece. This is the most active response."
+                    },
+                    "isWhite": false
+                },
+                {
+                    "move": "e5",
+                    "explanation": {
+                        "fr": "Les blancs gagnent de l'espace et chassent le cavalier. Ce pion devient une épine dans le camp noir.",
+                        "en": "White gains space and kicks the knight. This pawn becomes a thorn in Black's camp."
+                    },
+                    "isWhite": true
+                },
+                {
+                    "move": "Nd5",
+                    "explanation": {
+                        "fr": "Le cavalier bondit au centre ! De d5, il contrôle des cases clés et peut sauter en b4 ou f4.",
+                        "en": "The knight leaps to the center! From d5, it controls key squares and can jump to b4 or f4."
+                    },
+                    "isWhite": false
+                },
+                {
+                    "move": "d4",
+                    "explanation": {
+                        "fr": "Les blancs construisent leur centre de pions idéal : e5+d4. C'est une forteresse mobile qui avance.",
+                        "en": "White builds their ideal pawn center: e5+d4. It's a mobile fortress that advances."
+                    },
+                    "isWhite": true
+                },
+                {
+                    "move": "cxd4",
+                    "explanation": {
+                        "fr": "Les noirs ouvrent la colonne c et créent des tensions. Le pion d4 isolé des blancs peut devenir une cible.",
+                        "en": "Black opens the c-file and creates tensions. White's isolated d4 pawn can become a target."
+                    },
+                    "isWhite": false
+                },
+                {
+                    "move": "cxd4",
+                    "explanation": {
+                        "fr": "Les blancs reprennent au centre. Le pion d4 est isolé mais contrôle c5 et e5, donnant de l'espace.",
+                        "en": "White recaptures in the center. The d4 pawn is isolated but controls c5 and e5, giving space."
+                    },
+                    "isWhite": true
+                },
+                {
+                    "move": "Nc6",
+                    "explanation": {
+                        "fr": "Les noirs développent et attaquent d4. Le cavalier vise aussi e5 et peut sauter en b4.",
+                        "en": "Black develops and attacks d4. The knight also eyes e5 and can jump to b4."
+                    },
+                    "isWhite": false
+                },
+                {
+                    "move": "Nf3",
+                    "explanation": {
+                        "fr": "Développement naturel qui défend d4 et prépare Bd3. Les blancs gardent une structure solide.",
+                        "en": "Natural development defending d4 and preparing Bd3. White keeps a solid structure."
+                    },
+                    "isWhite": true
+                },
+                {
+                    "move": "Bg4",
+                    "explanation": {
+                        "fr": "Les noirs clouent le cavalier et créent des menaces tactiques. Si Nxf3, les blancs doublent leurs pions.",
+                        "en": "Black pins the knight and creates tactical threats. If Nxf3, White doubles their pawns."
+                    },
+                    "isWhite": false
+                },
+                {
+                    "move": "Bb5",
+                    "explanation": {
+                        "fr": "Les blancs clouent à leur tour ! Le cavalier c6 est immobilisé. C'est une lutte de clouages.",
+                        "en": "White pins in turn! The c6 knight is immobilized. It's a battle of pins."
+                    },
+                    "isWhite": true
+                },
+                {
+                    "move": "e6",
+                    "explanation": {
+                        "fr": "Les noirs libèrent le cavalier d5 qui peut aller en f4 ou b6. La structure se stabilise.",
+                        "en": "Black frees the d5 knight which can go to f4 or b6. The structure stabilizes."
+                    },
+                    "isWhite": false
+                },
+                {
+                    "move": "O-O",
+                    "explanation": {
+                        "fr": "Les blancs roquent et mettent leur roi en sécurité. Le plan est Re1, Bf4 et domination centrale.",
+                        "en": "White castles and puts their king to safety. The plan is Re1, Bf4 and central domination."
+                    },
+                    "isWhite": true
+                }
             ]
         };
 
@@ -503,6 +830,7 @@
         var currentVariation = 'sicilian_najdorf';
         var isDragging = false;
         var selectedSquare = null;
+        var userSide = 'w'; // 'w' for White, 'b' for Black
 
         function getUrlParameter(name) {
             name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
@@ -521,6 +849,7 @@
             var config = {
                 draggable: true,
                 position: 'start',
+
                 onDragStart: onDragStart,
                 onDrop: onDrop,
                 onSnapEnd: onSnapEnd,
@@ -549,6 +878,20 @@
             updateVariationButtons();
         }
 
+        
+        function setSide(side) {
+            userSide = side;
+            // Update buttons
+            document.getElementById('btn-side-w').classList.toggle('active', side === 'w');
+            document.getElementById('btn-side-b').classList.toggle('active', side === 'b');
+            
+            // Update board orientation
+            var orientation = (side === 'w') ? 'white' : 'black';
+            board.orientation(orientation);
+            
+            resetGame();
+        }
+
         function setVariation(variationKey) {
             currentVariation = variationKey;
             document.querySelectorAll('.var-btn').forEach(btn => btn.classList.remove('active'));
@@ -573,6 +916,11 @@
             document.getElementById('resetBtn').textContent = t.resetBtn;
             document.getElementById('historyTitle').textContent = t.historyTitle;
             updateStatusForCurrentMove();
+            
+            // If user plays Black, computer (White) must move first
+            if (userSide === 'b') {
+                setTimeout(makeComputerMove, 500);
+            }
         }
 
         function updateStatusForCurrentMove() {
@@ -639,11 +987,15 @@
             const currentMoves = variations[currentVariation];
             if (currentMoveIndex >= currentMoves.length) return;
             var expectedMove = currentMoves[currentMoveIndex];
-            if (!expectedMove.isWhite) return;
+            
+            // Check if it's player's turn
+            var isPlayerTurn = (expectedMove.isWhite && userSide === 'w') || (!expectedMove.isWhite && userSide === 'b');
+            if (!isPlayerTurn) return;
+
             removeHighlights();
             var piece = game.get(square);
             if (selectedSquare === null) {
-                if (piece && piece.color === 'w') {
+                if (piece && piece.color === userSide) {
                     selectedSquare = square;
                     highlightSquare(square);
                     highlightPossibleMoves(square);
@@ -656,7 +1008,7 @@
                 });
                 if (move === null) {
                     selectedSquare = null;
-                    if (piece && piece.color === 'w') {
+                    if (piece && piece.color === userSide) {
                         selectedSquare = square;
                         highlightSquare(square);
                         highlightPossibleMoves(square);
@@ -688,7 +1040,11 @@
                 return;
             }
             var expectedMove = currentMoves[currentMoveIndex];
-            if (!expectedMove.isWhite) {
+            
+            // Computer plays if it's NOT player's turn
+            var isPlayerTurn = (expectedMove.isWhite && userSide === 'w') || (!expectedMove.isWhite && userSide === 'b');
+            
+            if (!isPlayerTurn) {
                 setTimeout(function () {
                     game.move(expectedMove.move);
                     board.position(game.fen());
@@ -710,8 +1066,13 @@
             const currentMoves = variations[currentVariation];
             if (currentMoveIndex >= currentMoves.length) return false;
             var expectedMove = currentMoves[currentMoveIndex];
-            if (!expectedMove.isWhite) return false;
-            if (piece.search(/^b/) !== -1) return false;
+            
+            // Check if it's player's turn
+            var isPlayerTurn = (expectedMove.isWhite && userSide === 'w') || (!expectedMove.isWhite && userSide === 'b');
+            if (!isPlayerTurn) return false;
+            
+            // Allow dragging only player's pieces
+            if (piece.search(userSide === 'w' ? /^b/ : /^w/) !== -1) return false;
         }
 
         function onDrop(source, target) {
@@ -755,6 +1116,11 @@
             hideExplanation();
             document.getElementById('finalReport').style.display = 'none';
             updateStatusForCurrentMove();
+            
+            // If user plays Black, computer (White) must move first
+            if (userSide === 'b') {
+                setTimeout(makeComputerMove, 500);
+            }
         }
     </script>
 </body>
