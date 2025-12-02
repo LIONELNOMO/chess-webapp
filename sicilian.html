@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <title>Sicilian Defense Training</title>
+    <link rel="stylesheet" href="https://unpkg.com/@chrisoakman/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.css">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+    <div class="app-container">
+        <div class="header">
+            <h1 id="title">♟️ Sicilian Defense</h1>
+            <p class="subtitle" id="subtitle">Master the Sicilian</p>
+
+            <div class="language-selector">
+                <button class="lang-btn active" onclick="setLanguage('en')">🇬🇧 English</button>
+                <button class="lang-btn" onclick="setLanguage('fr')">🇫🇷 Français</button>
+            </div>
+
+            <div class="variation-selector">
+                <button class="var-btn active" onclick="setVariation('sicilian_najdorf')"
+                    id="btn-sicilian_najdorf">Najdorf</button>
+                <button class="var-btn" onclick="setVariation('sicilian_closed')"
+                    id="btn-sicilian_closed">Closed</button>
+                <button class="var-btn" onclick="setVariation('sicilian_alapin')"
+                    id="btn-sicilian_alapin">Alapin</button>
+            </div>
+        </div>
+
+        <div class="content">
+            <div id="status" class="status your-turn">
+                🎯 Your turn - Play e4
+            </div>
+
+            <div id="board-container">
+                <div id="board"></div>
+            </div>
+
+            <div class="explanation" id="explanation" style="display: none;">
+                <h3 id="explanationTitle">💡 Explanation</h3>
+                <p id="explanationText"></p>
+            </div>
+
+            <div class="final-report" id="finalReport" style="display: none;">
+                <h3 id="reportTitle">📊 Training Complete!</h3>
+                <p class="report-message" id="reportMessage"></p>
+            </div>
+
+            <div class="move-history">
+                <h3 id="historyTitle">📝 Moves</h3>
+                <div class="move-list" id="moveList"></div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <button class="reset-btn" id="resetBtn" onclick="resetGame()">🔄 Restart</button>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://unpkg.com/@chrisoakman/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
+
+    <script>
+        // Data specific to Sicilian Defense
+        var translations = {
+            en: {
+                title: '♟️ Sicilian Defense',
+                subtitle: 'Master the Sicilian',
+                yourTurn: '🎯 Your turn - Play ',
+                correct: '✅ Perfect!',
+                wrong: '❌ Wrong! Try ',
+                complete: '🎉 Training Complete!',
+                explanationTitle: '💡 Explanation',
+                resetBtn: '🔄 Restart',
+                historyTitle: '📝 Moves',
+                noMoves: 'No moves yet',
+                reportTitle: '📊 Training Complete!',
+                completionMessage: 'Congratulations! You have completed this variation.',
+                variations: {
+                    sicilian_najdorf: 'Najdorf',
+                    sicilian_closed: 'Closed Sicilian',
+                    sicilian_alapin: 'Alapin'
+                }
+            },
+            fr: {
+                title: '♟️ Défense Sicilienne',
+                subtitle: 'Maîtrise la Sicilienne',
+                yourTurn: '🎯 À toi - Joue ',
+                correct: '✅ Parfait !',
+                wrong: '❌ Erreur ! Joue ',
+                complete: '🎉 Entraînement Terminé !',
+                explanationTitle: '💡 Explication',
+                resetBtn: '🔄 Recommencer',
+                historyTitle: '📝 Coups',
+                noMoves: 'Aucun coup',
+                reportTitle: '📊 Entraînement Terminé !',
+                completionMessage: 'Félicitations ! Tu as terminé cette variante.',
+                variations: {
+                    sicilian_najdorf: 'Najdorf',
+                    sicilian_closed: 'Sicilienne Fermée',
+                    sicilian_alapin: 'Alapin'
+                }
+            }
+        };
+
+        var variations = {
+            'sicilian_najdorf': [
+                { move: 'e4', explanation: { en: 'Control the center.', fr: 'Contrôle du centre.' }, isWhite: true },
+                { move: 'c5', explanation: { en: 'The Sicilian! Control d4 from the flank.', fr: 'La Sicilienne ! Contrôle d4 depuis l\'aile.' }, isWhite: false },
+                { move: 'Nf3', explanation: { en: 'Prepare d4.', fr: 'Prépare d4.' }, isWhite: true },
+                { move: 'd6', explanation: { en: 'Control e5 and prevent e5.', fr: 'Contrôle e5 et empêche e5.' }, isWhite: false },
+                { move: 'd4', explanation: { en: 'Open the center.', fr: 'Ouvre le centre.' }, isWhite: true },
+                { move: 'cxd4', explanation: { en: 'Central exchange.', fr: 'Échange central.' }, isWhite: false },
+                { move: 'Nxd4', explanation: { en: 'Recapture.', fr: 'Reprise.' }, isWhite: true },
+                { move: 'Nf6', explanation: { en: 'Attack e4.', fr: 'Attaque e4.' }, isWhite: false },
+                { move: 'Nc3', explanation: { en: 'Defend e4.', fr: 'Défend e4.' }, isWhite: true },
+                { move: 'a6', explanation: { en: 'The Najdorf mark! Prevents Bb5/Nb5.', fr: 'La marque de la Najdorf ! Empêche Bb5/Nb5.' }, isWhite: false }
+            ],
+            'sicilian_closed': [
+                { move: 'e4', explanation: { en: 'Control the center.', fr: 'Contrôle du centre.' }, isWhite: true },
+                { move: 'c5', explanation: { en: 'The Sicilian.', fr: 'La Sicilienne.' }, isWhite: false },
+                { move: 'Nc3', explanation: { en: 'Closed Sicilian. No immediate d4.', fr: 'Sicilienne Fermée. Pas de d4 immédiat.' }, isWhite: true },
+                { move: 'Nc6', explanation: { en: 'Development.', fr: 'Développement.' }, isWhite: false },
+                { move: 'g3', explanation: { en: 'Preparing the fianchetto.', fr: 'Le fianchetto se prépare.' }, isWhite: true },
+                { move: 'g6', explanation: { en: 'Black does the same.', fr: 'Les noirs font de même.' }, isWhite: false },
+                { move: 'Bg2', explanation: { en: 'Controls the long diagonal.', fr: 'Contrôle la grande diagonale.' }, isWhite: true },
+                { move: 'Bg7', explanation: { en: 'Controls the long diagonal.', fr: 'Contrôle la grande diagonale.' }, isWhite: false },
+                { move: 'd3', explanation: { en: 'Solid.', fr: 'Solide.' }, isWhite: true },
+                { move: 'd6', explanation: { en: 'Solid.', fr: 'Solide.' }, isWhite: false }
+            ],
+            'sicilian_alapin': [
+                { move: 'e4', explanation: { en: 'Control the center.', fr: 'Contrôle du centre.' }, isWhite: true },
+                { move: 'c5', explanation: { en: 'The Sicilian.', fr: 'La Sicilienne.' }, isWhite: false },
+                { move: 'c3', explanation: { en: 'The Alapin. Prepares d4 for a strong center.', fr: 'L\'Alapin. Prépare d4 pour un fort centre.' }, isWhite: true },
+                { move: 'Nf6', explanation: { en: 'Attack e4.', fr: 'Attaque e4.' }, isWhite: false },
+                { move: 'e5', explanation: { en: 'Gain space and kick knight.', fr: 'Gagne de l\'espace et chasse le cavalier.' }, isWhite: true },
+                { move: 'Nd5', explanation: { en: 'Knight jumps to center.', fr: 'Le cavalier bondit au centre.' }, isWhite: false },
+                { move: 'd4', explanation: { en: 'Seizing the center.', fr: 'Prise du centre.' }, isWhite: true },
+                { move: 'cxd4', explanation: { en: 'Exchange.', fr: 'Échange.' }, isWhite: false },
+                { move: 'Nf3', explanation: { en: 'Development.', fr: 'Développement.' }, isWhite: true },
+                { move: 'e6', explanation: { en: 'Prepares development.', fr: 'Prépare le développement.' }, isWhite: false }
+            ]
+        };
+    </script>
+    <script src="js/game.js"></script>
+</body>
+
+</html>
